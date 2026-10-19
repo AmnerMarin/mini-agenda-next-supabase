@@ -2,6 +2,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import Link from "next/link";
 
 async function SpecialistsContent() {
     await connection();
@@ -64,6 +65,12 @@ async function SpecialistsContent() {
                                     <h2
                                         className="text-lg font-semibold text-[#102449]">{specialist.full_name}</h2>
                                     <p className="mt-2 text-sm text-slate-600">Especialista</p>
+                                    <Link
+                                        href={`/book/${specialist.id}`}
+                                        className="mt-4 inline-block rounded-lg bg-[#2457e8] px-4 py-2 font-semibold text-white hover:bg-blue-700"
+                                    >
+                                        Ver horarios
+                                    </Link>
                                 </article>
                             );
                         })}
@@ -76,7 +83,7 @@ async function SpecialistsContent() {
 function SpecialistsPage() {
     return (
         <main>
-            <Suspense fallback={<p>Cargando especialistas...</p>}>
+            <Suspense fallback={<p className="text-center text-xl font-bold mt-4 text-slate-500">Cargando especialistas...</p>}>
                 <SpecialistsContent />
             </Suspense>
         </main>

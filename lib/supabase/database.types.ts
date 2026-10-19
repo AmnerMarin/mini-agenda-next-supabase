@@ -121,6 +121,14 @@ export type Database = {
         Args: { p_specialist_id: string; p_starts_at: string }
         Returns: string
       }
+      get_busy_slots: {
+        Args: { p_day: string; p_specialist_id: string }
+        Returns: {
+          ends_at: string
+          starts_at: string
+          status: Database["public"]["Enums"]["booking_status"]
+        }[]
+      }
       is_slot_valid: {
         Args: { p_specialist_id: string; p_starts_at: string }
         Returns: boolean
