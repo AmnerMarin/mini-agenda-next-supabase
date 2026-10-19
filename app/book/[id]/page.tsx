@@ -1,10 +1,10 @@
-
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { supabaseServer } from "@/lib/supabase/server";
 import { computeDaySlots } from "@/lib/slots/computeDaySlots";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { BookingSlots } from "./BookingSlots";
 
 type BookPageProps = {
     params: Promise<{ id: string }>;
@@ -138,31 +138,10 @@ async function BookContent({
                 </button>
             </form>
 
-            <h2 className="mt-8 text-lg font-semibold">
-                Horarios disponibles
-            </h2>
-
-            {slots.length === 0 ? (
-                <p className="mt-4 rounded-lg bg-slate-100 p-4 text-slate-600">
-                    No hay horarios libres para esta fecha.
-                </p>
-            ) : (
-                <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    {slots.map((slot) => (
-                        <li
-                            key={slot}
-                            className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-center font-medium text-blue-900"
-                        >
-                            {new Date(slot).toLocaleTimeString("es-PE", {
-                                timeZone: "America/Lima",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: false
-                            })}
-                        </li>
-                    ))}
-                </ul>
-            )}
+            <BookingSlots
+                specialistId={specialist.id}
+                slots={slots}
+            />
         </main>
     );
 }
