@@ -1,4 +1,5 @@
 import { LogoutButton } from "@/components";
+import Link from "next/link";
 
 export default function ClientBookingsPage() {
     return (
@@ -11,7 +12,13 @@ export default function ClientBookingsPage() {
                 Aquí se mostrarán tus reservas.
             </p>
 
-            <LogoutButton />
+            <Link
+                href="/specialists"
+                className="inline-block rounded-lg bg-[#2457e8] px-4 py-3 font-semibold text-white hover:bg-blue-700 mb-3" 
+            >
+                Buscar especialistas
+            </Link>
+            <LogoutButton/>
         </main>
     );
 }

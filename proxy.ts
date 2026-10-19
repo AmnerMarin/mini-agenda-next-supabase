@@ -67,12 +67,19 @@ export async function proxy(request: NextRequest) {
     }
 
     // Proteger rutas de especialista (si no es especialista, lo bota a su home)
-    if (path.startsWith("/specialist") && profile.role !== "SPECIALIST") {
+    const isSpecialistRoute = path === "/specialist" || path.startsWith("/specialist/");
+    if (isSpecialistRoute && profile.role !== "SPECIALIST") {
         return redirectTo(home);
     }
 
     // Proteger rutas de cliente (si no es cliente, lo bota a su home)
-    const isClientRoute = path.startsWith("/client") || path.startsWith("/specialists") || path.startsWith("/book");
+    const isClientRoute =
+        path === "/client" ||
+        path.startsWith("/client/") ||
+        path === "/specialists" ||
+        path.startsWith("/specialists/") ||
+        path === "/book" ||
+        path.startsWith("/book/");
     if (isClientRoute && profile.role !== "CLIENT") {
         return redirectTo(home);
     }
