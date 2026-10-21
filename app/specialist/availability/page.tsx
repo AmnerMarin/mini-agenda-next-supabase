@@ -2,6 +2,9 @@ import { Suspense } from "react";
 import { supabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
+import Link from "next/link";
+import { LogoutButton } from "@/components";
+import { LuArrowLeft } from "react-icons/lu";
 import { AvailabilityForm } from "./AvailabilityForm";
 import { AvailabilityItem } from "./AvailabilityItem";
 
@@ -110,13 +113,25 @@ async function AvailabilityContent() {
 export default function AvailabilityPage() {
     return (
         <main className="mx-auto max-w-5xl p-6">
-            <h1 className="text-2xl font-bold text-[#102449]">
-                Mi disponibilidad
-            </h1>
+            <header className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
+                <div>
+                    <Link
+                        href="/specialist/bookings"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800 transition mb-2"
+                    >
+                        <LuArrowLeft className="w-4 h-4" />
+                        <span>Volver a mis reservas</span>
+                    </Link>
+                    <h1 className="text-2xl font-bold text-[#102449]">
+                        Mi disponibilidad
+                    </h1>
+                    <p className="mt-1 text-sm text-slate-600">
+                        Configura y consulta tus horarios semanales de atención.
+                    </p>
+                </div>
+                <LogoutButton />
+            </header>
 
-            <p className="mt-2 text-slate-600">
-                Consulta tus horarios semanales de atención.
-            </p>
             <AvailabilityForm />
 
             <Suspense fallback={<p className="mt-6 text-slate-500">Cargando disponibilidad...</p>}>

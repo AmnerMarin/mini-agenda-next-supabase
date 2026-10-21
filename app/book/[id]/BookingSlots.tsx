@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBooking } from "./actions";
+import { formatTime12h } from "@/lib/utils/formatTime";
 
 type BookingSlotsProps = {
     specialistId: string;
@@ -69,12 +70,7 @@ export function BookingSlots({
                             >
                                 {loadingSlot === slot
                                     ? "Reservando..."
-                                    : new Date(slot).toLocaleTimeString("es-PE", {
-                                        timeZone: "America/Lima",
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                        hour12: false
-                                    })
+                                    : formatTime12h(slot)
                                 }
                             </button>
                         </li>

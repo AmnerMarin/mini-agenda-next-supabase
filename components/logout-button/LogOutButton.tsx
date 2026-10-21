@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabase/client";
+import { LuLogOut } from "react-icons/lu";
 
 export function LogoutButton() {
     const router = useRouter();
@@ -25,9 +26,10 @@ export function LogoutButton() {
             <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700 font-medium transition"
             >
-                Cerrar sesión
+                <LuLogOut className="h-4 w-4" />
+                <span>Cerrar sesión</span>
             </button>
 
             {error && (

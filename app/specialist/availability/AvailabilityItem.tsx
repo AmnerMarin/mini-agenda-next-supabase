@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { availabilitySchema } from "@/lib/validation/availability";
 import { updateAvailability, deleteAvailability } from "./actions";
+import { formatTimeStr12h } from "@/lib/utils/formatTime";
+import { LuPencil, LuTrash2 } from "react-icons/lu";
 
 type AvailabilityItemProps = {
     rule: {
@@ -99,9 +101,9 @@ export function AvailabilityItem({ rule }: AvailabilityItemProps) {
             {!editing ? (
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <span className="text-sm font-medium text-blue-900">
-                        {rule.start_time.slice(0, 5)}
+                        {formatTimeStr12h(rule.start_time)}
                         {" – "}
-                        {rule.end_time.slice(0, 5)}
+                        {formatTimeStr12h(rule.end_time)}
                     </span>
 
                     <div className="flex gap-2">
@@ -112,18 +114,20 @@ export function AvailabilityItem({ rule }: AvailabilityItemProps) {
                                 setEditing(true);
                                 setMessage("");
                             }}
-                            className="rounded border border-blue-300 px-3 py-1 text-sm text-blue-700"
+                            className="inline-flex items-center gap-1 rounded border border-blue-300 px-3 py-1 text-sm text-blue-700 hover:bg-blue-100 transition"
                         >
-                            Editar
+                            <LuPencil className="w-3.5 h-3.5" />
+                            <span>Editar</span>
                         </button>
 
                         <button
                             type="button"
                             disabled={loading}
                             onClick={handleDelete}
-                            className="rounded border border-red-300 px-3 py-1 text-sm text-red-700"
+                            className="inline-flex items-center gap-1 rounded border border-red-300 px-3 py-1 text-sm text-red-700 hover:bg-red-100 transition"
                         >
-                            {loading ? "Eliminando..." : "Eliminar"}
+                            <LuTrash2 className="w-3.5 h-3.5" />
+                            <span>{loading ? "Eliminando..." : "Eliminar"}</span>
                         </button>
                     </div>
                 </div>

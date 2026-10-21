@@ -1,4 +1,6 @@
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import { LuArrowLeft, LuSearch } from "react-icons/lu";
 import { z } from "zod";
 import { supabaseServer } from "@/lib/supabase/server";
 import { computeDaySlots } from "@/lib/slots/computeDaySlots";
@@ -101,13 +103,20 @@ async function BookContent({
     );
     return (
         <main className="mx-auto max-w-3xl p-6">
+            <Link
+                href="/specialists"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800 transition mb-4"
+            >
+                <LuArrowLeft className="w-4 h-4" />
+                <span>Volver a especialistas</span>
+            </Link>
+
             <h1 className="text-2xl font-bold text-[#102449]">
                 Reservar con {specialist.full_name}
             </h1>
 
             <p className="mt-2 text-slate-600">
-                Selecciona una fecha para consultar
-                sesiones disponibles de 60 minutos.
+                Selecciona una fecha para consultar sesiones disponibles de 60 minutos.
             </p>
 
             <form method="get" className="mt-6 flex flex-wrap items-end gap-3">
@@ -132,9 +141,10 @@ async function BookContent({
 
                 <button
                     type="submit"
-                    className="rounded-lg bg-[#2457e8] px-5 py-3 font-semibold text-white"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#2457e8] px-5 py-3 font-semibold text-white hover:bg-blue-700 transition"
                 >
-                    Ver horarios
+                    <LuSearch className="w-4 h-4" />
+                    <span>Ver horarios</span>
                 </button>
             </form>
 

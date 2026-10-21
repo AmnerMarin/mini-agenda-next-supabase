@@ -4,6 +4,7 @@
 import { useState} from "react";
 import { availabilitySchema } from "@/lib/validation/availability";
 import { createAvailability } from "./actions";
+import { LuPlus } from "react-icons/lu";
 
 export function AvailabilityForm() {
     const [loading, setLoading] = useState(false);
@@ -128,9 +129,10 @@ export function AvailabilityForm() {
             <button
                 type="submit"
                 disabled={loading}
-                className="rounded-lg bg-[#2457e8] px-5 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#2457e8] px-5 py-3 font-semibold text-white hover:bg-blue-700 transition disabled:opacity-50"
             >
-                {loading ? "Guardando..." : "Guardar horario"}
+                <LuPlus className="w-4 h-4" />
+                <span>{loading ? "Guardando..." : "Guardar horario"}</span>
             </button>
 
             {message && (
