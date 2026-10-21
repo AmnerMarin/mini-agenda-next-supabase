@@ -4,7 +4,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { CancelBookingButton } from "./CancelBookingButton";
-import { LogoutButton } from "@/components";
+import { AddToCalendarButton, LogoutButton } from "@/components";
 import { formatTime12h } from "@/lib/utils/formatTime";
 import { LuCalendar, LuClock, LuPlus } from "react-icons/lu";
 
@@ -117,6 +117,16 @@ async function ClientBookingsContent() {
                             (booking.status === "PENDING" || booking.status === "CONFIRMED") &&
                             new Date(booking.starts_at) > now;
 
+                        const specialistData = booking.specialist as unknown as
+                            | { full_name: string }
+                            | { full_name: string }[]
+                            | null;
+
+                        const specialistName =
+                            (Array.isArray(specialistData)
+                                ? specialistData[0]?.full_name
+                                : specialistData?.full_name) ?? "Especialista";
+
                         return (
                             <article
                                 key={booking.id}
@@ -125,7 +135,7 @@ async function ClientBookingsContent() {
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div>
                                         <h2 className="text-lg font-bold text-[#102449]">
-                                            {booking.specialist?.[0]?.full_name ?? "Especialista"}
+                                            {specialistName}
                                         </h2>
                                         <p className="text-xs text-slate-500">Sesión de 60 minutos</p>
                                     </div>
@@ -157,11 +167,15 @@ async function ClientBookingsContent() {
                                     </div>
                                 </div>
 
-                                {canCancel && (
-                                    <div className="mt-4 border-t border-slate-100 pt-3">
+                                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3">
+                                    {booking.status === "CONFIRMED" && (
+                                        <AddToCalendarButton bookingId={booking.id} />
+                                    )}
+
+                                    {canCancel && (
                                         <CancelBookingButton bookingId={booking.id} />
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </article>
                         );
                     })}

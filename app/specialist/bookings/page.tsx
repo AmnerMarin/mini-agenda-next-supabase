@@ -4,7 +4,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { BookingActions } from "./BookingActions";
-import { LogoutButton } from "@/components";
+import { LogoutButton, AddToCalendarButton } from "@/components";
 import { formatTime12h } from "@/lib/utils/formatTime";
 import { LuCalendar, LuClock } from "react-icons/lu";
 
@@ -56,7 +56,9 @@ async function SpecialistBookingsContent() {
     // 3. Consultar las reservas del especialista
     const { data: bookings, error } = await supabase
         .from("bookings")
-        .select("id, starts_at, ends_at, status")
+        .select(
+            "id, starts_at, ends_at, status, client:profiles!bookings_client_id_fkey(full_name)"
+        )
         .eq("specialist_id", user.id)
         .order("starts_at", { ascending: false });
 
@@ -110,21 +112,35 @@ async function SpecialistBookingsContent() {
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {bookings?.map((booking) => (
-                        <article
-                            key={booking.id}
-                            className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300"
-                        >
-                            <div className="flex flex-wrap items-start justify-between gap-3">
-                                <div>
-                                    <h2 className="text-lg font-bold text-[#102449]">
-                                        Reserva de sesión
-                                    </h2>
-                                    <p className="text-xs text-slate-500">Sesión de 60 minutos</p>
-                                </div>
+                    {bookings?.map((booking) => {
+                        const clientData = booking.client as unknown as
+                            | { full_name: string }
+                            | { full_name: string }[]
+                            | null;
 
-                                <StatusBadge status={booking.status} />
-                            </div>
+                        const clientName =
+                            (Array.isArray(clientData)
+                                ? clientData[0]?.full_name
+                                : clientData?.full_name) ?? "Cliente";
+
+                        return (
+                            <article
+                                key={booking.id}
+                                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300"
+                            >
+                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                    <div>
+                                        <span className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+                                            Cita con
+                                        </span>
+                                        <h2 className="text-lg font-bold text-[#102449]">
+                                            {clientName}
+                                        </h2>
+                                        <p className="text-xs text-slate-500">Sesión de 60 minutos</p>
+                                    </div>
+
+                                    <StatusBadge status={booking.status} />
+                                </div>
 
                             <div className="mt-4 grid gap-2 sm:grid-cols-2 text-sm text-slate-600">
                                 <div className="flex items-center gap-2">
@@ -150,7 +166,7 @@ async function SpecialistBookingsContent() {
                                 </div>
                             </div>
 
-                            <div className="mt-4 border-t border-slate-100 pt-3">
+                            <div className="mt-4 border-t border-slate-100 pt-3 flex flex-wrap items-center justify-between gap-3">
                                 <BookingActions
                                     bookingId={booking.id}
                                     status={booking.status}
@@ -159,9 +175,14 @@ async function SpecialistBookingsContent() {
                                         new Date(booking.starts_at) <= now
                                     }
                                 />
+
+                                {booking.status === "CONFIRMED" && (
+                                    <AddToCalendarButton bookingId={booking.id} />
+                                )}
                             </div>
                         </article>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </main>
