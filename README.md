@@ -114,8 +114,4 @@ Para que el equipo evaluador pruebe ambos roles, proporcionaré por separado las
 
 ## Despliegue
 
-Para publicar la aplicación, conectaré este repositorio con Vercel y configuraré allí las variables de entorno de Supabase. La URL pública es:
-
-`PENDIENTE_DE_DESPLIEGUE`
-
-Cuando complete el despliegue en Vercel, reemplazaré ese marcador por la URL real.
+Para publicar la aplicación, conecté este repositorio con Vercel y configuraré allí las variables de entorno de Supabase. La URL pública es: https://mini-agenda-next-supabase-q7yk.vercel.app/
