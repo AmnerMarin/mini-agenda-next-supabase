@@ -33,10 +33,10 @@ export function CancelBookingButton({
         try {
             const result = await cancelBooking(bookingId);
 
-            if (result.success) {
+            if (result.data) {
                 router.refresh();
             } else {
-                setError(result.message);
+                setError(result.error ?? "No se pudo cancelar la reserva");
             }
         } catch {
             setError("Ocurrió un error al cancelar");

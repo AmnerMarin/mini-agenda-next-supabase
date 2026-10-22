@@ -6,22 +6,24 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { availabilitySchema } from "@/lib/validation/availability";
 import z from "zod";
 
-export async function createAvailability(input: unknown) {
+type ActionResult = {
+    data?: { message: string };
+    error?: string;
+};
+
+export async function createAvailability(input: unknown): Promise<ActionResult> {
     const supabase = await supabaseServer();
 
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        return { success: false, message: "No autenticado" };
+        return { error: "No autenticado" };
     }
 
     const result = availabilitySchema.safeParse(input);
 
     if (!result.success) {
-        return {
-            success: false,
-            message: result.error.issues[0]?.message ?? "Datos inválidos"
-        };
+        return { error: result.error.issues[0]?.message ?? "Datos inválidos" };
     }
 
     const { data: profile } = await supabase
@@ -31,7 +33,7 @@ export async function createAvailability(input: unknown) {
         .single();
 
     if (profile?.role !== "SPECIALIST") {
-        return { success: false, message: "No autorizado" };
+        return { error: "No autorizado" };
     }
 
     const { error } = await supabase
@@ -45,34 +47,27 @@ export async function createAvailability(input: unknown) {
 
     if (error) {
         if (error.code === "23P01") {
-            return {
-                success: false,
-                message: "Este horario se superpone con otro existente"
-            };
+            return { error: "Este horario se superpone con otro existente" };
         }
 
-        return {
-            success: false,
-            message: "No se pudo guardar el horario"
-        };
+        return { error: "No se pudo guardar el horario" };
     }
 
     // Actualizar la página
     revalidatePath("/specialist/availability");
 
     return {
-        success: true,
-        message: "Horario guardado correctamente"
+        data: { message: "Horario guardado correctamente" }
     };
 }
 
-export async function updateAvailability(id: string, input: unknown) {
+export async function updateAvailability(id: string, input: unknown): Promise<ActionResult> {
     const supabase = await supabaseServer();
 
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        return { success: false, message: "No autenticado" };
+        return { error: "No autenticado" };
     }
 
 
@@ -80,7 +75,7 @@ export async function updateAvailability(id: string, input: unknown) {
     const result = availabilitySchema.safeParse(input);
 
     if (!result.success || !parsedId.success) {
-        return { success: false, message: "Datos inválidos" };
+        return { error: "Datos inválidos" };
     }
 
     const { data: profile } = await supabase
@@ -90,7 +85,7 @@ export async function updateAvailability(id: string, input: unknown) {
         .single();
 
     if (profile?.role !== "SPECIALIST") {
-        return { success: false, message: "No autorizado" };
+        return { error: "No autorizado" };
     }
 
 
@@ -103,44 +98,34 @@ export async function updateAvailability(id: string, input: unknown) {
         .single();
 
     if (error?.code === "23P01") {
-        return {
-            success: false,
-            message: "El horario se superpone con otro existente"
-        };
+        return { error: "El horario se superpone con otro existente" };
     }
 
     if (error || !data) {
-        return {
-            success: false,
-            message: "No se pudo actualizar el horario"
-        };
+        return { error: "No se pudo actualizar el horario" };
     }
 
     revalidatePath("/specialist/availability");
 
     return {
-        success: true,
-        message: "Horario actualizado correctamente"
+        data: { message: "Horario actualizado correctamente" }
     };
 
 }
 
-export async function deleteAvailability(id: string) {
+export async function deleteAvailability(id: string): Promise<ActionResult> {
     const supabase = await supabaseServer();
 
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        return { success: false, message: "No autenticado" };
+        return { error: "No autenticado" };
     }
 
     const parsedId = z.string().uuid().safeParse(id);
 
     if (!parsedId.success) {
-        return {
-            success: false,
-            message: "ID de horario inválido"
-        };
+        return { error: "ID de horario inválido" };
     }
 
     const { data: profile } = await supabase
@@ -150,7 +135,7 @@ export async function deleteAvailability(id: string) {
         .single();
 
     if (profile?.role !== "SPECIALIST") {
-        return { success: false, message: "No autorizado" };
+        return { error: "No autorizado" };
     }
 
     const { data, error } = await supabase
@@ -162,15 +147,11 @@ export async function deleteAvailability(id: string) {
         .single();
 
     if (error || !data) {
-        return {
-            success: false,
-            message: "No se pudo eliminar el horario"
-        };
+        return { error: "No se pudo eliminar el horario" };
     }
     revalidatePath("/specialist/availability");
 
     return {
-        success: true,
-        message: "Horario eliminado correctamente"
+        data: { message: "Horario eliminado correctamente" }
     };
 }

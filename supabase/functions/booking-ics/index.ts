@@ -21,11 +21,24 @@ function errorResponse(message: string, status: number) {
     );
 }
 
-function formatDate(value: string): string {
-    return new Date(value)
-        .toISOString()
-        .replace(/[-:]/g, "")
-        .replace(/\.\d{3}/, "");
+function formatLocalDate(value: string | Date, timeZone = "America/Lima"): string {
+    const d = typeof value === "string" ? new Date(value) : value;
+    const formatter = new Intl.DateTimeFormat("sv-SE", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23"
+    });
+    return formatter.format(d).replace(" ", "T").replace(/[-:]/g, "");
+}
+
+function formatUtcDate(value: string | Date): string {
+    const d = typeof value === "string" ? new Date(value) : value;
+    return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
 Deno.serve(async (req: Request) => {
@@ -123,13 +136,25 @@ Deno.serve(async (req: Request) => {
         "VERSION:2.0",
         "PRODID:-//Mini-agenda//ES",
         "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "BEGIN:VTIMEZONE",
+        "TZID:America/Lima",
+        "X-LIC-LOCATION:America/Lima",
+        "BEGIN:STANDARD",
+        "TZOFFSETFROM:-0500",
+        "TZOFFSETTO:-0500",
+        "TZNAME:-05",
+        "DTSTART:19700101T000000",
+        "END:STANDARD",
+        "END:VTIMEZONE",
         "BEGIN:VEVENT",
         `UID:${booking.id}@mini-agenda`,
-        `DTSTAMP:${formatDate(new Date().toISOString())}`,
-        `DTSTART:${formatDate(booking.starts_at)}`,
-        `DTEND:${formatDate(booking.ends_at)}`,
+        `DTSTAMP:${formatUtcDate(new Date())}`,
+        `DTSTART;TZID=America/Lima:${formatLocalDate(booking.starts_at)}`,
+        `DTEND;TZID=America/Lima:${formatLocalDate(booking.ends_at)}`,
         "SUMMARY:Sesion de Mini-agenda",
         "DESCRIPTION:Reserva confirmada en Mini-agenda",
+        "STATUS:CONFIRMED",
         "END:VEVENT",
         "END:VCALENDAR"
     ].join("\r\n") + "\r\n";

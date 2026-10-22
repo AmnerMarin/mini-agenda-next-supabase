@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import { BookingActions } from "./BookingActions";
 import { LogoutButton, AddToCalendarButton } from "@/components";
 import { formatTime12h } from "@/lib/utils/formatTime";
-import { LuCalendar, LuClock } from "react-icons/lu";
+import { LuCalendar, LuClock, LuBriefcase } from "react-icons/lu";
 
 function StatusBadge({ status }: { status: string }) {
     const config: Record<string, { label: string; bg: string; text: string; border: string }> = {
@@ -41,7 +41,7 @@ async function SpecialistBookingsContent() {
     // 2. Autorización
     const { data: profile } = await supabase
         .from("profiles")
-        .select("role")
+        .select("full_name, role")
         .eq("id", user.id)
         .single();
 
@@ -77,6 +77,24 @@ async function SpecialistBookingsContent() {
     // 4. Mostrar las reservas
     return (
         <main className="mx-auto max-w-4xl p-6">
+            {/* Banner de Bienvenida Profesional */}
+            <div className="mb-6 flex items-center gap-4 rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/80 via-indigo-50/40 to-white p-4 shadow-sm">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20">
+                    <LuBriefcase className="h-6 w-6" />
+                </div>
+                <div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                            Especialista
+                        </span>
+                        <span className="h-2 w-2 rounded-full bg-emerald-500" title="En línea" />
+                    </div>
+                    <h2 className="text-xl font-bold text-[#102449]">
+                        ¡Bienvenido, {profile?.full_name ?? "Especialista"}!
+                    </h2>
+                </div>
+            </div>
+
             <header className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
                 <div>
                     <h1 className="text-2xl font-bold text-[#102449]">

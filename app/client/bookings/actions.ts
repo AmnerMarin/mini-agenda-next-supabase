@@ -4,21 +4,26 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 
-export async function cancelBooking(bookingId: string) {
+type ActionResult = {
+    data?: { message: string };
+    error?: string;
+};
+
+export async function cancelBooking(bookingId: string): Promise<ActionResult> {
     const supabase = await supabaseServer();
 
     // 1. Autenticación
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        return { success: false, message: "No autenticado" };
+        return { error: "No autenticado" };
     }
 
     // 2. Validación
     const result = z.uuid().safeParse(bookingId);
 
     if (!result.success) {
-        return { success: false, message: "Reserva inválida" };
+        return { error: "Reserva inválida" };
     }
 
     // 3. Autorización
@@ -29,7 +34,7 @@ export async function cancelBooking(bookingId: string) {
         .single();
 
     if (profile?.role !== "CLIENT") {
-        return { success: false, message: "No autorizado" };
+        return { error: "No autorizado" };
     }
 
     // 4. Cambiar el estado de la reserva
@@ -44,17 +49,13 @@ export async function cancelBooking(bookingId: string) {
         .maybeSingle();
 
     if (error || !data) {
-        return {
-            success: false,
-            message: "Esta reserva ya no se puede cancelar"
-        };
+        return { error: "Esta reserva ya no se puede cancelar" };
     }
 
     // 5. Actualizar la página
     revalidatePath("/client/bookings");
 
     return {
-        success: true,
-        message: "Reserva cancelada correctamente"
+        data: { message: "Reserva cancelada correctamente" }
     };
 }

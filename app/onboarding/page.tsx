@@ -1,11 +1,9 @@
 
 "use client";
 
-import { useState} from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-import { Field, RoleSelector} from "@/components";
-
+import { Field, RoleSelector } from "@/components";
 import { completeOnboarding } from "./actions";
 
 export default function OnboardingPage() {

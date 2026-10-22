@@ -15,7 +15,12 @@ export function LogoutButton() {
 
         const supabase = supabaseClient();
 
-        await supabase.auth.signOut();
+        const { error: signOutError } = await supabase.auth.signOut();
+
+        if (signOutError) {
+            setError("No se pudo cerrar sesión");
+            return;
+        }
 
         router.replace("/auth/login");
         router.refresh();

@@ -10,21 +10,26 @@ const statusSchema = z.object({
     status: z.enum(["CONFIRMED", "CANCELLED", "COMPLETED"])
 });
 
-export async function updateBookingStatus(input: unknown) {
+type ActionResult = {
+    data?: { message: string };
+    error?: string;
+};
+
+export async function updateBookingStatus(input: unknown): Promise<ActionResult> {
     const supabase = await supabaseServer();
 
     // 1. Autenticación
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        return { success: false, message: "No autenticado" };
+        return { error: "No autenticado" };
     }
 
     // 2. Validación
     const result = statusSchema.safeParse(input);
 
     if (!result.success) {
-        return { success: false, message: "Datos inválidos" };
+        return { error: "Datos inválidos" };
     }
 
     // 3. Autorización
@@ -35,7 +40,7 @@ export async function updateBookingStatus(input: unknown) {
         .single();
 
     if (profile?.role !== "SPECIALIST") {
-        return { success: false, message: "No autorizado" };
+        return { error: "No autorizado" };
     }
 
     // 4. Identificar el estado desde el cual se permite el cambio
@@ -63,10 +68,7 @@ export async function updateBookingStatus(input: unknown) {
         .maybeSingle();
 
     if (error || !data) {
-        return {
-            success: false,
-            message: "No se pudo cambiar el estado de esta reserva"
-        };
+        return { error: "No se pudo cambiar el estado de esta reserva" };
     }
 
     // 6. Actualizar las pantallas
@@ -74,7 +76,6 @@ export async function updateBookingStatus(input: unknown) {
     revalidatePath("/client/bookings");
 
     return {
-        success: true,
-        message: "Estado actualizado correctamente"
+        data: { message: "Estado actualizado correctamente" }
     };
 }

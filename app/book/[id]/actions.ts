@@ -9,27 +9,26 @@ const bookingSchema = z.object({
     startsAt: z.iso.datetime()
 });
 
-export async function createBooking(input: unknown) {
+type BookingActionResult = {
+    data?: { message?: string; refresh?: boolean };
+    error?: string;
+};
+
+export async function createBooking(input: unknown): Promise<BookingActionResult> {
     const supabase = await supabaseServer();
 
     // 1. Autenticación
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        return {
-            success: false,
-            message: "Debes iniciar sesión"
-        };
+        return { error: "Debes iniciar sesión" };
     }
 
     // 2. Validación
     const result = bookingSchema.safeParse(input);
 
     if (!result.success) {
-        return {
-            success: false,
-            message: "Los datos de la reserva son inválidos"
-        };
+        return { error: "Los datos de la reserva son inválidos" };
     }
 
     // 3. Autorización
@@ -40,10 +39,7 @@ export async function createBooking(input: unknown) {
         .single();
 
     if (profile?.role !== "CLIENT") {
-        return {
-            success: false,
-            message: "Solo los clientes pueden reservar"
-        };
+        return { error: "Solo los clientes pueden reservar" };
     }
 
     // 4. Crear la reserva mediante la RPC
@@ -57,24 +53,21 @@ export async function createBooking(input: unknown) {
 
     if (error?.code === "23P01") {
         return {
-            success: false,
-            message: "Ese horario ya fue tomado",
-            refresh: true
+            data: { refresh: true },
+            error: "Ese horario ya fue tomado"
         };
     }
 
     if (error?.code === "23514") {
         return {
-            success: false,
-            message: "Ese horario ya no está disponible",
-            refresh: true
+            data: { refresh: true },
+            error: "Ese horario ya no está disponible"
         };
     }
 
     if (error || !bookingId) {
         return {
-            success: false,
-            message: "No se pudo crear la reserva"
+            error: error?.message ?? "No se pudo crear la reserva"
         };
     }
 
@@ -83,8 +76,9 @@ export async function createBooking(input: unknown) {
     revalidatePath("/client/bookings");
 
     return {
-        success: true,
-        message: "Reserva creada correctamente. Estado: PENDING",
-        refresh: true
+        data: {
+            message: "Reserva creada correctamente. Estado: PENDING",
+            refresh: true
+        }
     };
 }

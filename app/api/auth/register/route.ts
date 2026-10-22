@@ -31,7 +31,6 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-        console.error("Error en Supabase signUp:", error);
         return NextResponse.json(
             { error: error.message ?? "No se pudo completar el registro" },
             { status: error.status ?? 400 }

@@ -156,19 +156,14 @@ async function BookContent({
     );
 }
 
-function BookPage(props: BookPageProps) {
+export default function BookPage(props: BookPageProps) {
     return (
-        <div>
-            <Suspense fallback={
-                <p className="text-center text-xl font-bold mt-4 text-slate-500">Cargando reservas...</p>
-            }>
-                <BookContent
-                    {...props}
-                />
-            </Suspense>
-        </div>
-
+        <Suspense fallback={
+            <p className="text-center text-xl font-bold mt-4 text-slate-500">Cargando reservas...</p>
+        }>
+            <BookContent
+                {...props}
+            />
+        </Suspense>
     );
 }
-
-export default BookPage;

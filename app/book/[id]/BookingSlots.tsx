@@ -34,10 +34,10 @@ export function BookingSlots({
                 startsAt
             });
 
-            setMessage(result.message);
-            setIsError(!result.success);
+            setMessage(result.error ?? result.data?.message ?? "");
+            setIsError(Boolean(result.error));
 
-            if (result.refresh) {
+            if (result.data?.refresh) {
                 router.refresh();
             }
         } catch {

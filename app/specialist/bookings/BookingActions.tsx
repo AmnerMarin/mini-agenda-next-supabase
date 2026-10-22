@@ -48,10 +48,10 @@ export function BookingActions({
                 status: newStatus
             });
 
-            if (result.success) {
+            if (result.data) {
                 router.refresh();
             } else {
-                setError(result.message);
+                setError(result.error ?? "No se pudo actualizar la reserva");
             }
         } catch {
             setError("Ocurrió un error al actualizar la reserva");

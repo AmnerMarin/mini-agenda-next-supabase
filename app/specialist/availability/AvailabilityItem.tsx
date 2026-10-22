@@ -52,10 +52,10 @@ export function AvailabilityItem({ rule }: AvailabilityItemProps) {
         try {
             const result = await updateAvailability(rule.id, values);
 
-            setMessage(result.message);
-            setIsError(!result.success);
+            setMessage(result.error ?? result.data?.message ?? "");
+            setIsError(Boolean(result.error));
 
-            if (result.success) {
+            if (result.data) {
                 setEditing(false);
                 router.refresh();
             }
@@ -82,10 +82,10 @@ export function AvailabilityItem({ rule }: AvailabilityItemProps) {
         try {
             const result = await deleteAvailability(rule.id);
 
-            setMessage(result.message);
-            setIsError(!result.success);
+            setMessage(result.error ?? result.data?.message ?? "");
+            setIsError(Boolean(result.error));
 
-            if (result.success) {
+            if (result.data) {
                 router.refresh();
             }
         } catch {

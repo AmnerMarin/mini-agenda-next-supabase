@@ -1,7 +1,7 @@
 //Mostrar el formulario y sus mensajes.
 "use client";
 
-import { useState} from "react";
+import { useState } from "react";
 import { availabilitySchema } from "@/lib/validation/availability";
 import { createAvailability } from "./actions";
 import { LuPlus } from "react-icons/lu";
@@ -40,10 +40,10 @@ export function AvailabilityForm() {
         try {
             const result = await createAvailability(values);
 
-            setMessage(result.message);
-            setIsError(!result.success);
+            setMessage(result.error ?? result.data?.message ?? "");
+            setIsError(Boolean(result.error));
 
-            if (result.success) {
+            if (result.data) {
                 form.reset();
             }
         } catch {
